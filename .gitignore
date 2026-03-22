@@ -30,8 +30,6 @@ venv/
 .venv/
 env/
 ENV/
-env.bak/
-venv.bak/
 
 # Logs
 *.log
@@ -54,10 +52,4 @@ reports/*
 .coverage
 .coverage.*
 .cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
 .pytest_cache/
-pytestdebug.log
