@@ -1,0 +1,31 @@
+---
+name: failure_patterns
+description: 'Strict correlation rules for contextualizing and categorizing raw scanner telemetry logic flows.'
+categories: [Correlation, Filtering, Escalation]
+rules:
+  - id: FP-001
+    description: "WAF/IPS Blockage misinterpreted as Vulnerability"
+    severity: LOW
+    match: 
+      - "status_code:\s*(403|406|501)"
+      - "(?i)headers:.*(cloudflare|akamai|imperva|aws-waf)"
+    never_accept: "Assuming a 500 or 403 response to a malicious payload dictates successful exploitation. It dictates explicit interception."
+    always_require: "Verification that the PoC actually reflects the payload in the DOM or demonstrably alters system state before confirming High/Critical severity."
+
+  - id: FP-002
+    description: "Test/Mock/Fixture Credentials flagged as Production Secrets"
+    severity: INFO
+    match: 
+      - "path:.*(/test/|/__tests__/|/fixtures/|/mock|test_.*\.py)"
+      - "value:\s*['\"](test_token|mock_api_key_123|example_secret)['\"]"
+    never_accept: "Elevating mock vulnerabilities discovered inside designated testing scopes to a Production-level Critical finding."
+    always_require: "Downgrading exactly this finding to 'Info' severity and appending an explicit '(Test Context)' tag."
+
+  - id: DUP-001
+    description: "SAST & DAST Convergence on the Identical Finding"
+    severity: CRITICAL
+    match:
+      - "sast_cwe:\s*(CWE-89|CWE-79|CWE-22)"
+      - "dast_cwe:\s*\1"
+      - "target_endpoint:\s*(.*)"
+    always_require: "Merging the SAST AST File/Line context with the DAST HTTP Request/Response PoC proof into one consolidated vulnerability ticket."

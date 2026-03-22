@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerability Report - {{ date }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6; }
+        .container { max-width: 1200px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #2c3e50; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eaeaea; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 2em; }
+        .metadata { text-align: right; color: #7f8c8d; }
+        .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .card { padding: 20px; border-radius: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd; }
+        .card-critical { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .card-high { background-color: #ffedd5; color: #9a3412; border-color: #fdba74; }
+        .card-medium { background-color: #fef08a; color: #854d0e; border-color: #fde047; }
+        .card-low { background-color: #e0f2fe; color: #075985; border-color: #7dd3fc; }
+        .vuln-item { border-left: 5px solid #ccc; padding: 15px; margin-bottom: 25px; background: #fafafa; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .vuln-critical { border-left-color: #dc2626; }
+        .vuln-high { border-left-color: #ea580c; }
+        .vuln-medium { border-left-color: #ca8a04; }
+        .vuln-low { border-left-color: #0284c7; }
+        .vuln-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dotted #ccc; padding-bottom: 5px; margin-bottom: 10px; }
+        .vuln-title { margin: 0; font-size: 1.3em; color: #1e293b; font-weight: bold; }
+        .severity-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; text-transform: uppercase; }
+        .badge-critical { background: #b91c1c; color: #fff; }
+        .badge-high { background: #ea580c; color: #fff; }
+        .badge-medium { background: #eab308; color: #000; }
+        .badge-low { background: #0ea5e9; color: #fff; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; font-size: 0.9em; }
+        th { background: #f8fafc; font-weight: bold; }
+        .code-block { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; font-size: 0.9em; overflow-x: auto; margin-top: 10px; }
+        hr { border: 0; height: 1px; background: #eaeaea; margin: 40px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Vulnerability Report</h1>
+                <p>Vulnix Security Orchestrator Automated Assessment</p>
+            </div>
+            <div class="metadata">
+                <p><strong>Date:</strong> {{ date }}</p>
+                <p><strong>Target Scope:</strong> {{ target_scope }}</p>
+                <p><strong>Assessor:</strong> {{ assessor | default("Vulnix Scanner") }}</p>
+            </div>
+        </div>
+
+        <h2>Executive Metrics</h2>
+        <div class="summary-cards">
+            <div class="card card-critical">
+                <div>CRITICAL</div>
+                <div style="font-size: 2em; margin-top: 5px;">{{ critical_count | default('0') }}</div>
+            </div>
+            <div class="card card-high">
+                <div>HIGH</div>
+                <div style="font-size: 2em; margin-top: 5px;">{{ high_count | default('0') }}</div>
+            </div>
+            <div class="card card-medium">
+                <div>MEDIUM</div>
+                <div style="font-size: 2em; margin-top: 5px;">{{ medium_count | default('0') }}</div>
+            </div>
+            <div class="card card-low">
+                <div>LOW</div>
+                <div style="font-size: 2em; margin-top: 5px;">{{ low_count | default('0') }}</div>
+            </div>
+        </div>
+
+        <hr/>
+
+        <h2>Detailed Findings</h2>
+        {% if findings and findings|length > 0 %}
+            {% for vuln in findings %}
+            <div class="vuln-item vuln-{{ vuln.severity | lower }}">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">{{ loop.index }}. {{ vuln.name }}</h3>
+                    <span class="severity-badge badge-{{ vuln.severity | lower }}">{{ vuln.severity }}</span>
+                </div>
+                
+                <table>
+                    <tr>
+                        <th width="20%">CVE/CWE Identifier</th>
+                        <td width="30%">{{ vuln.cwe_id | default("N/A") }}</td>
+                        <th width="20%">CVSS Score</th>
+                        <td width="30%">{{ vuln.cvss_score | default("N/A") }}</td>
+                    </tr>
+                    <tr>
+                        <th>Target/Component</th>
+                        <td>{{ vuln.component }}</td>
+                        <th>Status</th>
+                        <td>{{ vuln.status | default("Open") }}</td>
+                    </tr>
+                </table>
+
+                <p><strong>Description:</strong></p>
+                <p>{{ vuln.description }}</p>
+
+                <p><strong>Business Impact:</strong></p>
+                <p>{{ vuln.business_impact }}</p>
+
+                {% if vuln.poc %}
+                <p><strong>Proof of Concept (PoC) / Trace:</strong></p>
+                <div class="code-block">{{ vuln.poc }}</div>
+                {% endif %}
+
+                <p><strong>Remediation:</strong></p>
+                <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 10px; margin-top: 10px;">
+                    {{ vuln.remediation }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 50px; color: #6b7280; border: 2px dashed #d1d5db; border-radius: 8px;">
+                <h3 style="color: #6b7280;">No Vulnerabilities Found</h3>
+                <p>The automated scan completed successfully, and no vulnerabilities matching the target scope were detected.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

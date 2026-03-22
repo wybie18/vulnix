@@ -1,0 +1,52 @@
+# Known Malicious Packages, Typosquatting Patterns, and Supply Chain Risk Indicators
+
+## 1. High-Profile Typosquatting Patterns
+# (Attackers target popular names with slight misspellings)
+reqeusts
+request
+urlllib
+bs4-dummy
+electorn
+crossenv
+coffee-scipt
+discord.js-core
+
+## 2. Suspicious Naming / Identity Spoofing
+# Packages mimicking internal namespace structures
+@company-internal/utils
+com.internal.auth 
+org.internal.core
+
+## 3. Known Compromised Versions (Historical Context)
+event-stream (payload injected in v3.3.6)
+flatmap-stream (malicious injection)
+ua-parser-js (compromised in 0.7.29, 0.8.0, 1.0.0)
+colors (faker/colors sabotage in v1.4.44-liberty-2)
+faker (sabotage in 6.6.6)
+rc (sabotaged version 1.3.9)
+node-ipc (peacenotwar payload in v10.1.1, v10.1.3)
+ctx (compromised versions stealing env vars)
+
+## 4. Dangerous Lifecycle Script Execution Indicators
+# Flags to search for inside standard `postinstall` or `setup.py` scripts
+curl -s http://
+wget -qO-
+bash -c 'echo [a-zA-Z0-9+/=]+ | base64 -d'
+eval(Buffer.from(
+exec(require('child_process')
+os.system("curl
+os.popen("wget
+socket.socket
+urllib.request.urlopen("http://bindshell
+
+## 5. Typical Data Exfiltration Targets
+# Malicious packages often attempt to read and upload these files:
+/etc/passwd
+/etc/shadow
+~/.aws/credentials
+~/.aws/config
+~/.kube/config
+~/.ssh/id_rsa
+.env
+.npmrc
+.git-credentials

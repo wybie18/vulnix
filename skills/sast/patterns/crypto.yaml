@@ -1,0 +1,34 @@
+---
+name: crypto_patterns
+description: 'Heuristics for identifying weak cryptography, broken PRNGs, and inappropriate ciphers through static analysis.'
+cwe: [CWE-327, CWE-330, CWE-798]
+rules:
+  - id: CRYPTO-001
+    description: "Weak or deprecated Hashing Algorithms"
+    severity: HIGH
+    match:
+      - "hashlib\.md5\("
+      - "hashlib\.sha1\("
+      - "crypto\.createHash\(['\"]md5['\"]\)"
+      - "crypto\.createHash\(['\"]sha1['\"]\)"
+    never_accept: "The presence of MD5 or SHA-1 hashes used in password storage or digital signature logic."
+    always_require: "Implementation of bcrypt, Argon2, or PBKDF2 for passwords; or at least SHA-256/SHA-512 for integrity assertions."
+
+  - id: CRYPTO-002
+    description: "Insecure Pseudo-Random Number Generators (PRNGs) for security contexts"
+    severity: HIGH
+    match:
+      - "random\.choice\("
+      - "random\.randint\("
+      - "Math\.random\(\)"
+    never_accept: "Mathematically predictable outputs mapped directly to password reset strings, authentication tokens, or session IDs."
+    always_require: "Verified CSPRNG module abstractions (e.g., Python 'secrets', WebCrypto API, Node 'crypto.randomBytes()')."
+
+  - id: CRYPTO-003
+    description: "Hardcoded Initialization Vectors (IV) or Cryptographic Keys"
+    severity: CRITICAL
+    match:
+      - "AES\.new\(.*iv=['\"][a-zA-Z0-9_\-\+]{16}['\"]"
+      - "crypto\.createCipheriv\(.*['\"][a-zA-Z0-9_\-\+]{16}['\"]"
+    never_accept: "Identical, static strings utilized as cryptographic salts or IVs, defeating entropy generation."
+    always_require: "A newly generated, unique IV/Salt per operation securely concatenated with the resulting cipher text."

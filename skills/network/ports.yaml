@@ -1,0 +1,71 @@
+# High-Risk Port and Service Exposure Mapping
+# Defines criticality when a service is exposed to the public internet (0.0.0.0/0)
+
+ports:
+  # Unencrypted Legacy Protocols
+  21: 
+    service: "FTP"
+    risk: "Medium"
+    notes: "Plaintext credential transmission risk. High risk if anonymous login is enabled."
+  23: 
+    service: "Telnet"
+    risk: "High"
+    notes: "Plaintext credential transmission. Trivially intercepted."
+  
+  # Remote Management / Administration
+  22: 
+    service: "SSH"
+    risk: "Medium"
+    notes: "Requires secure key-based auth. Flag if password auth is enabled or root login permitted."
+  3389: 
+    service: "Microsoft RDP"
+    risk: "High"
+    notes: "Often targeted by ransomware gangs. Should require VPN/MFA."
+  5900:
+    service: "VNC"
+    risk: "High"
+    notes: "Unencrypted GUI access. Easily brute-forced if exposed."
+
+  # Databases (Always Critical over Public Internet)
+  1433:
+    service: "Microsoft SQL Server"
+    risk: "Critical"
+    notes: "Direct database access. No legitimate reason for public exposure."
+  1521: 
+    service: "Oracle Database"
+    risk: "Critical"
+    notes: "Direct database access. No legitimate reason for public exposure."
+  3306: 
+    service: "MySQL"
+    risk: "Critical"
+    notes: "Direct database access. No legitimate reason for public exposure."
+  5432: 
+    service: "PostgreSQL"
+    risk: "Critical"
+    notes: "Direct database access. No legitimate reason for public exposure."
+  6379: 
+    service: "Redis"
+    risk: "Critical"
+    notes: "Often lacks authentication natively. Leads to rapid data destruction/RCE."
+  27017: 
+    service: "MongoDB"
+    risk: "Critical"
+    notes: "Frequent target for autonomous data-wiper bots."
+
+  # DevOps / Deployment Stacks
+  2375:
+    service: "Docker Daemon"
+    risk: "Critical"
+    notes: "Unauthenticated Docker socket leads to immediate root-level infrastructure takeover."
+  6443:
+    service: "Kubernetes API"
+    risk: "High"
+    notes: "The control plane of a K8s cluster. Highly sensitive."
+  8080:
+    service: "HTTP Alternate / Tomcat / Jenkins"
+    risk: "Medium"
+    notes: "Often hosts internal administrative or management GUIs without authentication."
+  9200:
+    service: "Elasticsearch"
+    risk: "Critical"
+    notes: "Commonly lacks authentication by default. Easily scraped for PII."

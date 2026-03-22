@@ -1,0 +1,42 @@
+---
+name: injection_patterns
+description: 'Strict regex and AST matching heuristics for Injection flaws.'
+cwe: [CWE-89, CWE-78, CWE-94, CWE-79]
+rules:
+  - id: SQLI-001
+    description: "Detects string formatting statically mapped inside Python SQL execution sinks"
+    severity: CRITICAL
+    match: 
+      - "execute\(.*%.*\)"
+      - "execute\(.*f\".*\".*\)"
+      - "execute\(.*\.format\(.*\).*\)"
+    never_accept: "Direct string interpolation resolving inside 'execute()' or equivalent ORM sinks."
+    always_require: "Parameterized query logic natively handled by the driver (e.g., execute('SELECT * FROM users WHERE id=?', (id,)))"
+  
+  - id: CMDI-001
+    description: "Unsafe subprocess environments triggering OS execution context"
+    severity: CRITICAL
+    match:
+      - "subprocess\.Popen\(.*shell=True.*\)"
+      - "os\.system\(.*\)"
+      - "os\.popen\(.*\)"
+    never_accept: "shell=True constraints invoked alongside any variable reflecting external user scope."
+    always_require: "Strict arrays passed dynamically into subprocess commands without bash interpretation (e.g., shell=False)."
+
+  - id: XSS-001
+    description: "Disabling automated Web framework XSS bounds without verifiable sanitization"
+    severity: HIGH
+    match:
+      - "dangerouslySetInnerHTML"
+      - "v-html"
+      - "\|safe"
+    always_require: "Validation that the injected arbitrary object implicitly originates from DOMPurify or explicit sanitizer libraries."
+
+  - id: DESERIAL-001
+    description: "Language-level insecure object deserialization routines"
+    severity: CRITICAL
+    match:
+      - "pickle\.load\("
+      - "yaml\.unsafe_load\("
+      - "eval\("
+    never_accept: "Accepting unmodified untrusted states passed to code-interpreting deserializers."

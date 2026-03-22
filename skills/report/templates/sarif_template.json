@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Vulnix Security Orchestrator",
+          "informationUri": "https://github.com/vulnix-security",
+          "version": "1.0.0",
+          "rules": [
+            {
+              "id": "VULNIX-001",
+              "name": "Generic_Vulnerability_Rule",
+              "shortDescription": {
+                "text": "A dynamically assessed vulnerability rule."
+              },
+              "help": {
+                "text": "Check the detailed message block or the tool references for specific remediation context.",
+                "markdown": "Review the `remediation_refs.yaml` dictionary for specific patch paths."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-0"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "VULNIX-001",
+          "level": "error",
+          "message": {
+            "text": "Vulnerability Found: {Vulnerability Name}. Impact: {Risk Rating}."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "filepath/vuln_file.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "endLine": 5,
+                  "snippet": {
+                    "text": "vulnerable_code_snippet_here"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "cwe": "CWE-0",
+            "cvss_score": "9.8",
+            "poc": "Validated Proof of Concept Output"
+          }
+        }
+      ]
+    }
+  ]
+}

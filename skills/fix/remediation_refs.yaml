@@ -1,0 +1,54 @@
+# Universal Remediation and Mitigation Mapping Reference
+
+patterns:
+  # Injection Flaws
+  CWE-89: 
+    name: "SQL Injection"
+    fix_type: "Parameterization"
+    directive: "Convert string-concatenated SQL queries into Prepared Statements or parameterized ORM calls. Never use blacklisting against single quotes."
+    mitigation_fallback: "Apply WAF strict SQLi rule sets. Limit the executing database user to least-privilege (drop DELETE/DROP rights)."
+
+  CWE-79: 
+    name: "Cross-Site Scripting (XSS)"
+    fix_type: "Context-Aware Encoding"
+    directive: "Utilize built-in framework encoding (e.g., React native DOM rendering, Jinja2 autoescape) or robust sanitizers like DOMPurify. Match encoding to the reflection context (HTML body vs JS block)."
+    mitigation_fallback: "Implement a strict Content Security Policy (CSP) blocking 'unsafe-inline' and 'unsafe-eval'."
+
+  CWE-78:
+    name: "OS Command Injection"
+    fix_type: "API Re-Alignment / Parameterization"
+    directive: "Avoid passing raw strings to shell executors. Use programmatic APIs (e.g., `os.mkdir` instead of `os.system('mkdir')`) or pass arguments as strictly separated arrays where the runtime disables shell interpretation."
+    mitigation_fallback: "Run the executing process inside an AppArmor/SELinux boundary or unprivileged container."
+  
+  CWE-22:
+    name: "Path Traversal / Local File Inclusion"
+    fix_type: "Absolute Path Validation"
+    directive: "Do not process user input as direct filesystem paths. If required, map input to an index/ID, or enforce strict allowlisting against an absolute base directory (e.g., `realpath()` checking against a defined root)."
+
+  # Broken Access Controls
+  CWE-289:
+    name: "Insecure Direct Object Reference (IDOR) / BOLA"
+    fix_type: "Authorization Enforcement"
+    directive: "Always verify the currently authenticated user owns or has explicit permission to access the requested resource ID before fulfilling the request. Do not trust sequentially guessable IDs."
+  
+  CWE-306:
+    name: "Missing Authentication for Critical Function"
+    fix_type: "Middleware / Decorator Enforcement"
+    directive: "Apply framework-level authentication middlewares/decorators (e.g., `@login_required`) natively to the controller. Do not rely on client-side routing to obscure unauthenticated endpoints."
+
+  # Cryptographic Failures
+  CWE-327:
+    name: "Use of a Broken or Risky Cryptographic Algorithm"
+    fix_type: "Migration to Standard Primitives"
+    directive: "Replace MD5/SHA1, DES, or custom algorithms with industry standards. Use AES-GCM for symmetric encryption, RSA-OAEP, or bcrypt/Argon2 for password hashing."
+
+  CWE-798:
+    name: "Use of Hard-coded Credentials"
+    fix_type: "Environment Variable Extraction"
+    directive: "Remove the credential from the source code. Replace it with a call to the environment explicitly (e.g., `os.environ.get('API_KEY')`) or an external Secrets Manager."
+
+  # Misconfigurations
+  CWE-352:
+    name: "Cross-Site Request Forgery (CSRF)"
+    fix_type: "Token Integration / Cookie Flags"
+    directive: "Enforce state-changing POST/PUT/DELETE requests with Anti-CSRF tokens tied to the user's session. Enforce `SameSite=Lax` or `SameSite=Strict` on session cookies natively."

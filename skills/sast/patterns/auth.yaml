@@ -1,0 +1,30 @@
+---
+name: auth_patterns
+description: 'Strict static heuristics for authentication, session management, and authorization bypass flaws.'
+cwe: [CWE-287, CWE-284, CWE-306, CWE-614]
+rules:
+  - id: AUTH-001
+    description: "Hardcoded default privileged credentials residing in functional logic"
+    severity: CRITICAL
+    match: 
+      - "(?i)(password|secret|key)\s*=\s*['\"](admin|12345|password|root|root123)['\"]"
+      - "(?i)(username|user)\s*=\s*['\"](admin|root|superuser)['\"]"
+    never_accept: "Hardcoded dummy logic placed inside production branch execution flows."
+    always_require: "All sensitive authenticators to be managed dynamically via secrets configuration or environmental loads."
+
+  - id: AUTH-002
+    description: "Bypassed or improperly validated JSON Web Tokens"
+    severity: CRITICAL
+    match:
+      - "jwt\.decode\(.*verify=False.*\)"
+      - "jwt\.decode\(.*verify_signature=False.*\)"
+    never_accept: "The 'verify=False' clause used in non-debug code paths."
+    always_require: "Explicit cryptographic validation bound to a hardened public key or a protected server-side HS256 root secret."
+
+  - id: AUTH-003
+    description: "Insecure Session Cookie release configurations"
+    severity: MEDIUM
+    match:
+      - "set_cookie\(.*secure=False.*\)"
+      - "set_cookie\(.*httponly=False.*\)"
+    never_accept: "Cookies establishing authentication state devoid of Secure mapping or exposed directly to DOM manipulation (HttpOnly missing)."
