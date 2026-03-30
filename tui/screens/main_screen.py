@@ -4,7 +4,7 @@ from textual.screen import Screen
 from textual.widgets import Footer, Header, RichLog, Static
 from typing import Optional
 
-from ..database import Session, MessageManager
+from ..database import models, events
 from ..utils import log_message
 from ..widgets import ActiveContext, AgentBrain, CommandPrompt, LootReport
 
@@ -23,6 +23,10 @@ class MainScreen(Screen):
     
     #app-footer {
         margin-top: 1;
+    }
+
+    #app-footer > FooterKey:last-child {
+        dock: right;
     }
     
     #main-container {
@@ -107,20 +111,9 @@ class MainScreen(Screen):
     }
     """
     
-    def __init__(
-        self, 
-        model: str, 
-        provider: str, 
-        safe_mode: bool,
-        session: Optional[Session] = None,
-        message_manager: Optional[MessageManager] = None
-    ):
+    def __init__(self, session: Optional[models.Session] = None):
         super().__init__()
-        self.model = model
-        self.provider = provider
-        self.safe_mode = safe_mode
         self.session = session
-        self.message_manager = message_manager
     
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True, id="app-header")
@@ -141,15 +134,18 @@ class MainScreen(Screen):
         
         richlog = self.query_one("#agent-log", RichLog)
         
-        # Load conversation history if we have a session
-        if self.session and self.message_manager:
-            messages = self.message_manager.get_history(self.session.id)
-            for msg in messages:
-                # Display the message with appropriate tag
-                tag = msg.tag or msg.role.upper()
-                log_message(richlog, tag, msg.content)
+        # Load event history if we have a session
+        if self.session:
+            event_list = events.tail(self.session.id, since_id=0, limit=100)
+            for event in event_list:
+                if event.type == "log":
+                    payload = event.payload_json
+                    tag = payload.get("tag", "SYSTEM")
+                    message = payload.get("message", "")
+                    if message:
+                        log_message(richlog, tag, message)
         else:
-            # Default startup messages if no history
+            # Default startup messages if no session
             log_message(richlog, "SYSTEM", "Swarm initialized.")
             log_message(richlog, "AGENT", "Parsing active context and scope.")
             log_message(richlog, "TRACE", "Connected to GitHub Copilot provider.")
@@ -158,19 +154,25 @@ class MainScreen(Screen):
     
     def _update_context_panel(self, status: str) -> None:
         """Update the active context panel with current status."""
+        if not self.session:
+            return
+            
+        config = self.session.config_json
+        model = config.get("model", "Unknown")
+        provider = config.get("provider", "Unknown")
+        agents = config.get("agents", [])
+        
         status_color = "bold $text-success" if status == "SCANNING" else "bold $text-warning"
-        safe_mode_label = "ON" if self.safe_mode else "OFF"
-        safe_mode_color = "bold $text-success" if self.safe_mode else "bold $text-warning"
         
         context_text = (
-            "[bold $text-primary]TARGET[/]  github.com/example/repo\n"
+            f"[bold $text-primary]TARGET[/]  {self.session.target}\n"
             f"[bold $text-primary]STATUS[/]  [{status_color}]{status}[/]\n"
-            f"[bold $text-primary]MODEL[/]   {self.model}\n"
+            f"[bold $text-primary]MODEL[/]   {model}\n"
             "[bold $text-primary]MODE[/]    Vulnerability Assessment\n\n"
-            f"[$text-muted]Provider:[/] {self.provider}\n"
-            f"[$text-muted]Safe mode:[/] [{safe_mode_color}]{safe_mode_label}[/]\n"
-            "[$text-muted]Active agents:[/] DAST, SAST, Secrets, Fuzz\n"
-            "[$text-muted]Last event:[/] Pattern baseline loaded"
+            f"[$text-muted]Provider:[/] {provider}\n"
+            f"[$text-muted]Active agents:[/] {', '.join(agents)}\n"
+            f"[$text-muted]Findings:[/] {self.session.finding_count}\n"
+            f"[$text-muted]Started:[/] {self.session.started_at[:19]}"
         )
         self.query_one("#context-info", Static).update(context_text)
     
