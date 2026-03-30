@@ -18,7 +18,6 @@ class CommandPrompt(TextArea):
         self.model_info = model_info
 
     def on_mount(self) -> None:
-        self.border_title = "[ COMMAND ]"
         self.show_line_numbers = False
         
         # Set bottom subtitle if model_info is provided
@@ -26,17 +25,18 @@ class CommandPrompt(TextArea):
             self.border_subtitle = self.model_info
 
     def on_key(self, event: events.Key) -> None:
-        if event.key == "shift+enter":
-            self.insert("\n")
-            event.stop()
-            return
-
         if event.key == "enter":
             value = self.text.strip()
             if value:
                 self.post_message(self.Submitted(self, value))
             self.clear()
             event.stop()
+            return
+
+        if event.key == "shift+enter":
+            self.insert("\n")
+            event.stop()
+            return
     
     def watch_text(self, new_text: str) -> None:
         line_count = max(1, new_text.count('\n') + 1)
