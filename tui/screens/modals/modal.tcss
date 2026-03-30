@@ -1,0 +1,90 @@
+/* Base modal styling - applies to all ModalScreen subclasses */
+ModalScreen {
+    align: center middle;
+}
+
+/* Shared modal container */
+.modal-container {
+    width: 60;
+    height: auto;
+    max-height: 60%;
+    background: $surface;
+    border: round $accent;
+    padding: 1 2;
+}
+
+/* Shared modal list */
+.modal-list {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.modal-list > ListItem {
+    padding: 0 1;
+}
+
+.modal-list > ListItem:hover {
+    background: $primary-darken-2;
+}
+
+.modal-list > ListItem.--highlight {
+    background: $primary-darken-2;
+}
+
+.modal-list:focus > ListItem.--highlight {
+    background: $primary-darken-1;
+}
+
+.modal-list > .section-header {
+    background: transparent;
+    padding: 1 1 0 1;
+}
+
+.modal-list > .section-header:hover {
+    background: transparent;
+}
+
+.modal-list > .section-header.--highlight {
+    background: transparent;
+}
+
+SectionHeader {
+    color: $text-primary;
+    text-style: bold;
+    width: 100%;
+}
+
+.menu-item {
+    width: 100%;
+    height: auto;
+    padding: 0;
+}
+
+.menu-item-content {
+    width: 1fr;
+}
+
+.menu-item-key {
+    width: auto;
+    color: $text-muted;
+    text-align: right;
+}
+
+.modal-footer {
+    width: 100%;
+    height: auto;
+    border-top: solid $primary-darken-2;
+    margin-top: 1;
+    padding-top: 1;
+    content-align: center middle;
+    text-align: center;
+    color: $text-muted;
+}
+
+.mt-1 {
+    margin-top: 1;
+}
