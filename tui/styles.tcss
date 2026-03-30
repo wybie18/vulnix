@@ -41,3 +41,24 @@ Markdown {
 #loot-markdown {
     padding: 0 1;
 }
+
+/* COMMAND PALETTE STYLING */
+CommandPalette {
+    align: center middle;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+CommandPalette > Input {
+    width: 60;
+    border: heavy $accent;
+    background: $panel;
+    margin-bottom: 1;
+}
+
+CommandPalette > CommandList {
+    width: 60;
+    height: auto;
+    max-height: 15;
+    border: solid $primary;
+    background: $panel;
+}
