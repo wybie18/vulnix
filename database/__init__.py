@@ -1,12 +1,12 @@
 """Database package for VULNIX."""
 
 from .connection import init_db, get_conn
-from . import models
-from . import sessions
-from . import findings
-from . import conversation
-from . import events
-from . import reports
+from database import models
+from database import sessions
+from database import findings
+from database import conversation
+from database import events
+from database import reports
 
 __all__ = [
     "init_db",

@@ -4,7 +4,7 @@ import pathlib
 import sqlite3
 from contextlib import contextmanager
 
-from ..config.settings import DB_PATH
+from config.settings import DB_PATH
 
 _SCHEMA = pathlib.Path(__file__).parent / "schema.sql"
 
