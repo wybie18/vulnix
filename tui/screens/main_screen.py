@@ -4,7 +4,7 @@ from textual.screen import Screen
 from textual.widgets import Footer, Header, RichLog, Static
 from typing import Optional
 
-from ..database import models, events
+from database import models, events
 from ..utils import log_message
 from ..widgets import ActiveContext, AgentBrain, CommandPrompt, LootReport
 
