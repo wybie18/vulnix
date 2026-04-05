@@ -1,6 +1,8 @@
 from textual.app import App
 
-from .database import init_db, sessions, events
+from database import init_db
+
+from database import sessions, events
 from .screens import MainScreen, WelcomeScreen
 from .screens.modals import SettingsScreen
 from .utils import ASCII_ART
